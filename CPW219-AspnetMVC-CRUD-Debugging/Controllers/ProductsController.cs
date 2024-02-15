@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 namespace CPW219_AspnetMVC_CRUD_Debugging.Controllers
 {
     public class ProductsController : Controller
+
     {
         private readonly ProductContext _context;
 
@@ -12,12 +13,15 @@ namespace CPW219_AspnetMVC_CRUD_Debugging.Controllers
         {
             _context = context;
         }
-
-        public async Task<IActionResult> Index()
+        [HttpGet]
+        public IActionResult Index()
         {
-            return View(await _context.Product.ToListAsync());
+            List<Product> products = _context.Product.ToList();
+
+            return View(products);
         }
 
+        [HttpGet]
         public IActionResult Create()
         {
             return View();
@@ -28,8 +32,10 @@ namespace CPW219_AspnetMVC_CRUD_Debugging.Controllers
         {
             if (ModelState.IsValid)
             {
-                await _context.AddAsync(product);
-                return RedirectToAction(nameof(Index));
+                _context.Product.Add(product);
+                await _context.SaveChangesAsync();
+
+                ViewData["Message"] = $"{product.Name} added successfully";
             }
             return View(product);
         }
@@ -59,8 +65,7 @@ namespace CPW219_AspnetMVC_CRUD_Debugging.Controllers
 
         public async Task<IActionResult> Delete(int id)
         {
-            var product = await _context.Product
-                .FirstOrDefaultAsync(m => m.ProductId == id);
+            var product = await _context.Product.FindAsync(id);
 
             if (product == null)
             {
@@ -75,6 +80,7 @@ namespace CPW219_AspnetMVC_CRUD_Debugging.Controllers
         {
             var product = await _context.Product.FindAsync(id);
             _context.Product.Remove(product);
+            await _context.SaveChangesAsync(); // Save changes after removing the product
             return RedirectToAction(nameof(Index));
         }
 
