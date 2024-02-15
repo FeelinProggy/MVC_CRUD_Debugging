@@ -4,6 +4,11 @@
     ViewData["Title"] = "Create";
 }
 
+@if (ViewData["Message"] != null)
+{
+    <p>@ViewData["Message"] </p>
+}
+
 <h1>Create</h1>
 
 <h4>Product</h4>
